@@ -19,11 +19,11 @@ const run = async ({ beeUrl, postageBatchId, dir, headers, options, requestOptio
     core.info(`Starting upload from directory: ${dir} using postage batch: ${postageBatchId}`);
 
     const { reference, tagUid } = await bee.uploadFilesFromDirectory(postageBatchId, dir, options, requestOptions);
-    core.info(`Files successfully uploaded. Reference: ${reference}, Tag UID: ${tagUid}`);
+    core.info(`Files successfully uploaded. Reference: ${reference}, Tag UID: ${tagUid ?? 'none'}`);
 
     core.setOutput('reference', reference);
-    core.setOutput('tagUid', tagUid);
-  } catch (error: any) {
+    core.setOutput('tagUid', tagUid ?? 'none');
+  } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
     core.error(`Error during upload: ${errorMessage}`);
     core.setFailed(`Error uploading files: ${errorMessage}`);
@@ -70,7 +70,7 @@ const main = async (): Promise<void> => {
       options,
       requestOptions,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
     core.error(`Error in main function: ${errorMessage}`);
     core.setFailed(`Error running main: ${errorMessage}`);
@@ -78,7 +78,7 @@ const main = async (): Promise<void> => {
 };
 
 // Catch unhandled promise rejections
-main().catch((err) => {
+main().catch((err: unknown) => {
   const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
   core.error(`Unhandled error: ${errorMessage}`);
   core.setFailed(errorMessage);

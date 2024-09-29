@@ -7,7 +7,7 @@ import { toBoolean, toNumber, toString } from './options';
 type Inputs = {
   beeUrl: string;
   postageBatchId: BatchId;
-  dir: string;
+  dir: string[];
   headers: Record<string, string>;
   options: CollectionUploadOptions;
   requestOptions: BeeRequestOptions;
@@ -18,7 +18,7 @@ const run = async ({ beeUrl, postageBatchId, dir, headers, options, requestOptio
     const bee = new Bee(beeUrl, { headers });
     core.info(`Starting upload from directory: ${dir} using postage batch: ${postageBatchId}`);
 
-    const { reference, tagUid } = await bee.uploadFilesFromDirectory(postageBatchId, dir, options, requestOptions);
+    const { reference, tagUid } = await bee.uploadFiles(postageBatchId, dir, options, requestOptions);
     core.info(`Files successfully uploaded. Reference: ${reference}, Tag UID: ${tagUid ?? 'none'}`);
 
     core.setOutput('reference', reference);

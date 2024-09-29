@@ -33,13 +33,16 @@ const run = async ({ beeUrl, postageBatchId, dir, headers, options, requestOptio
 const main = async (): Promise<void> => {
   try {
     const beeUrl = core.getInput('bee-url', { required: true });
-    const postageBatchId = core.getInput('postage-batch-id', { required: true });
+    const postageBatchIdInput = core.getInput('postage-batch-id', { required: true });
     const dir = core.getInput('dir', { required: true });
 
     // Validate postageBatchId format
-    if (!/^[0-9a-fA-F]{64}$/.test(postageBatchId)) {
+    if (!/^[0-9a-fA-F]{64}$/.test(postageBatchIdInput)) {
       throw new Error('postage-batch-id must be a 64-character hexadecimal string');
     }
+
+    // Type cast the validated postageBatchId to BatchId
+    const postageBatchId = postageBatchIdInput as BatchId;
 
     const headers = parseHeaders(core.getInput('headers'));
 

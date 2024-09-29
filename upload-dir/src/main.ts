@@ -7,7 +7,7 @@ import { toBoolean, toNumber, toString } from './options';
 type Inputs = {
   beeUrl: string;
   postageBatchId: BatchId;
-  dir: string[];
+  dir: string[];  // Expecting multiple directories as an array
   headers: Record<string, string>;
   options: CollectionUploadOptions;
   requestOptions: BeeRequestOptions;
@@ -16,13 +16,17 @@ type Inputs = {
 const run = async ({ beeUrl, postageBatchId, dir, headers, options, requestOptions }: Inputs): Promise<void> => {
   try {
     const bee = new Bee(beeUrl, { headers });
-    core.info(`Starting upload from directory: ${dir} using postage batch: ${postageBatchId}`);
 
-    const { reference, tagUid } = await bee.uploadFiles(postageBatchId, dir, options, requestOptions);
-    core.info(`Files successfully uploaded. Reference: ${reference}, Tag UID: ${tagUid ?? 'none'}`);
+    for (const directory of dir) {
+      core.info(`Starting upload from directory: ${directory} using postage batch: ${postageBatchId}`);
 
-    core.setOutput('reference', reference);
-    core.setOutput('tagUid', tagUid ?? 'none');
+      const { reference, tagUid } = await bee.uploadFiles(postageBatchId, directory, options, requestOptions);
+      core.info(`Files from ${directory} successfully uploaded. Reference: ${reference}, Tag UID: ${tagUid ?? 'none'}`);
+
+      // Set outputs for each directory
+      core.setOutput(`reference-${directory}`, reference);
+      core.setOutput(`tagUid-${directory}`, tagUid ?? 'none');
+    }
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
     core.error(`Error during upload: ${errorMessage}`);
@@ -34,7 +38,7 @@ const main = async (): Promise<void> => {
   try {
     const beeUrl = core.getInput('bee-url', { required: true });
     const postageBatchIdInput = core.getInput('postage-batch-id', { required: true });
-    const dir = core.getInput('dir', { required: true });
+    const dirInput = core.getInput('dir', { required: true });
 
     // Validate postageBatchId format
     if (!/^[0-9a-fA-F]{64}$/.test(postageBatchIdInput)) {
@@ -43,6 +47,9 @@ const main = async (): Promise<void> => {
 
     // Type cast the validated postageBatchId to BatchId
     const postageBatchId = postageBatchIdInput as BatchId;
+
+    // Handle both single directory and comma-separated list of directories
+    const dir = dirInput.includes(',') ? dirInput.split(',').map(d => d.trim()) : [dirInput];
 
     const headers = parseHeaders(core.getInput('headers'));
 
@@ -60,8 +67,8 @@ const main = async (): Promise<void> => {
       timeout: toNumber(core.getInput('timeout')),
     };
 
-    core.info(`Running upload with Bee URL: ${beeUrl}, directory: ${dir}`);
-    
+    core.info(`Running upload with Bee URL: ${beeUrl}, directories: ${dir.join(', ')}`);
+
     await run({
       beeUrl,
       dir,

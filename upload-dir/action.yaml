@@ -48,11 +48,6 @@ inputs:
     required: false
     default: 'false'
 
-  retry:
-    description: 'Configure backoff mechanism for requests retries. Specifies how many retries will be performed before failing a request.'
-    required: false
-    default: '2'
-
   tag:
     description: 'Tags keep track of syncing the data with network. This option allows attach existing Tag UUID to the uploaded data.'
     required: false

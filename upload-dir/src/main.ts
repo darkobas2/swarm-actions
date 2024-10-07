@@ -36,7 +36,6 @@ const main = async (): Promise<void> => {
   }
 
   const requestOptions: BeeRequestOptions = {
-    retry: toNumber(core.getInput('retry')),
     timeout: toNumber(core.getInput('timeout')),
   }
 

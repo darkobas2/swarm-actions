@@ -35,7 +35,6 @@ jobs:
 | `error-document`   | `false`  | `undefined`                                                        | Configure custom error document to be returned when a specified path can not be found in collection.                     |
 | `index-document`   | `false`  | `undefined`                                                        | Default file to be returned when the root hash of collection is accessed.                                                |
 | `pin`              | `false`  | `false`                                                            | Will pin the data locally in the Bee node as well.                                                                       |
-| `retry`            | `false`  | `2`                                                                | Configure backoff mechanism for requests retries. Specifies how many retries will be performed before failing a request. |
 | `tag`              | `false`  | `undefined`                                                        | Tags keep track of syncing the data with network. This option allows attach existing Tag UUID to the uploaded data.      |
 | `timeout`          | `false`  | `undefined`                                                        | Timeout of requests in milliseconds.                                                                                     |
 
